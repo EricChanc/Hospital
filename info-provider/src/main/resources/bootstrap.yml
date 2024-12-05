@@ -1,0 +1,13 @@
+spring:
+    cloud:
+        nacos:
+            config:
+                namespace: 55b70459-77d4-46e5-a911-fa1fd31abf47
+                server-addr: 127.0.0.1:8848
+                group: dev
+                prefix: info-provider
+                file-extension: yaml
+jasypt:
+    encryptor:
+        password: 123456 #加密时用的密码
+        algorithm: PBEWithMD5AndDES #加密算法

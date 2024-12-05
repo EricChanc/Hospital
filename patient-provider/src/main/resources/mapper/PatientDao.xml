@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.PatientMapper">
+
+    <resultMap type="com.example.entity.Patient" id="PatientMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="cardnum" column="cardNum" jdbcType="VARCHAR"/>
+        <result property="regnum" column="regNum" jdbcType="VARCHAR"/>
+        <result property="patientname" column="patientName" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="INTEGER"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="carType" column="car_type" jdbcType="INTEGER"/>
+        <result property="national" column="national" jdbcType="INTEGER"/>
+        <result property="idcard" column="idCard" jdbcType="VARCHAR"/>
+        <result property="maritalType" column="marital_type" jdbcType="INTEGER"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="company" column="company" jdbcType="VARCHAR"/>
+        <result property="nationId" column="nation_id" jdbcType="INTEGER"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="occupation" column="occupation" jdbcType="VARCHAR"/>
+        <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+        <result property="areaId" column="area_id" jdbcType="INTEGER"/>
+        <result property="contactName" column="contact_name" jdbcType="VARCHAR"/>
+        <result property="contactPhone" column="contact_phone" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="cardNumBarPic" column="card_num_bar_pic" jdbcType="VARCHAR"/>
+        <result property="cardNumPic" column="card_num_pic" jdbcType="VARCHAR"/>
+        <result property="regNumBarPic" column="reg_num_bar_pic" jdbcType="VARCHAR"/>
+        <result property="regNunPic" column="reg_nun_pic" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="isDefault" column="is_default" jdbcType="INTEGER"/>
+        <result property="isDelete" column="is_delete" jdbcType="INTEGER"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into 130_his.patient(cardNum, regNum, patientName, gender, birthday, car_type, national, idCard, marital_type, phone, company, nation_id, address, occupation, province_id, city_id, area_id, contact_name, contact_phone, create_time, update_time, card_num_bar_pic, card_num_pic, reg_num_bar_pic, reg_nun_pic, user_id, is_default, is_delete, version)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.cardnum}, #{entity.regnum}, #{entity.patientname}, #{entity.gender}, #{entity.birthday}, #{entity.carType}, #{entity.national}, #{entity.idcard}, #{entity.maritalType}, #{entity.phone}, #{entity.company}, #{entity.nationId}, #{entity.address}, #{entity.occupation}, #{entity.provinceId}, #{entity.cityId}, #{entity.areaId}, #{entity.contactName}, #{entity.contactPhone}, #{entity.createTime}, #{entity.updateTime}, #{entity.cardNumBarPic}, #{entity.cardNumPic}, #{entity.regNumBarPic}, #{entity.regNunPic}, #{entity.userId}, #{entity.isDefault}, #{entity.isDelete}, #{entity.version})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into 130_his.patient(cardNum, regNum, patientName, gender, birthday, car_type, national, idCard, marital_type, phone, company, nation_id, address, occupation, province_id, city_id, area_id, contact_name, contact_phone, create_time, update_time, card_num_bar_pic, card_num_pic, reg_num_bar_pic, reg_nun_pic, user_id, is_default, is_delete, version)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.cardnum}, #{entity.regnum}, #{entity.patientname}, #{entity.gender}, #{entity.birthday}, #{entity.carType}, #{entity.national}, #{entity.idcard}, #{entity.maritalType}, #{entity.phone}, #{entity.company}, #{entity.nationId}, #{entity.address}, #{entity.occupation}, #{entity.provinceId}, #{entity.cityId}, #{entity.areaId}, #{entity.contactName}, #{entity.contactPhone}, #{entity.createTime}, #{entity.updateTime}, #{entity.cardNumBarPic}, #{entity.cardNumPic}, #{entity.regNumBarPic}, #{entity.regNunPic}, #{entity.userId}, #{entity.isDefault}, #{entity.isDelete}, #{entity.version})
+        </foreach>
+        on duplicate key update
+cardNum = values(cardNum) , regNum = values(regNum) , patientName = values(patientName) , gender = values(gender) , birthday = values(birthday) , car_type = values(car_type) , national = values(national) , idCard = values(idCard) , marital_type = values(marital_type) , phone = values(phone) , company = values(company) , nation_id = values(nation_id) , address = values(address) , occupation = values(occupation) , province_id = values(province_id) , city_id = values(city_id) , area_id = values(area_id) , contact_name = values(contact_name) , contact_phone = values(contact_phone) , create_time = values(create_time) , update_time = values(update_time) , card_num_bar_pic = values(card_num_bar_pic) , card_num_pic = values(card_num_pic) , reg_num_bar_pic = values(reg_num_bar_pic) , reg_nun_pic = values(reg_nun_pic) , user_id = values(user_id) , is_default = values(is_default) , is_delete = values(is_delete) , version = values(version)     </insert>
+
+    <select id="queryDefaultPatient" resultType="com.example.vo.PatientVo"
+    parameterType="Long">
+        select p.id,p.patientName,g.dict_name genderName,
+            p.regNum, p.cardNum, p.card_num_pic cardNumPic,
+            timestampdiff(year,birthday,current_date) age
+        from patient p,
+            (select dict_value, dict_name
+                from dictionary
+                where dict_type_id=(
+                    select id from dictionary_type
+                where type_code='GENDER_TYPE'
+                )
+            )g
+
+        where p.gender=g.dict_value
+        and p.user_id=#{userId}
+        and p.is_default=1
+        and p.is_delete=0
+    </select>
+</mapper>
+
